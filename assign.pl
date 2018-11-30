@@ -44,7 +44,7 @@ rule(P1,P2,P3,P4,P5,P6,P7,P8):- (accept(I,adapter(L1),
 								dst_addr(L5),
 								tcp_udp_src_port(L6),
 								tcp_udp_dest_port(L7),
-								icmp_code(L8))),write(L1),Z=accept;
+								icmp_code(L8))),term_string(F,P1),string_chars(L1,L9),contains(',',L9),Z=accept;
 
 								reject(I,adapter(L1),
 								ether(vid(L2),proto(L3)),
@@ -52,7 +52,7 @@ rule(P1,P2,P3,P4,P5,P6,P7,P8):- (accept(I,adapter(L1),
 								dst_addr(L5),
 								tcp_udp_src_port(L6),
 								tcp_udp_dest_port(L7),
-								icmp_code(L8))),write(L1),Z=reject;
+								icmp_code(L8))),Z=reject;
 
 								drop(I,adapter(L1),
 								ether(vid(L2),proto(L3)),
@@ -62,9 +62,16 @@ rule(P1,P2,P3,P4,P5,P6,P7,P8):- (accept(I,adapter(L1),
 								tcp_udp_dest_port(L7),
 								icmp_code(L8))),Z=drop)
 								
-								,check_lists([P1,P2,P3,P4,P5,P6,P7,P8],[L1,L2,L3,L4,L5,L6,L7,L8]),
+							    ,check_lists([F,P2,P3,P4,P5,P6,P7,P8],[L9,L2,L3,L4,L5,L6,L7,L8]),
 								test(Z,I).
-
+rule(P1,P2,P3,P4,P5,P6,P7,P8):- accept(I,adapter(L1),
+								ether(vid(L2),proto(L3)),
+								ip(src_addr(L4),
+								dst_addr(L5),
+								tcp_udp_src_port(L6),
+								tcp_udp_dest_port(L7),
+								icmp_code(L8))),term_string(F,P1),string_chars(L1,L9),contains('-',L9),Z=accept,
+								nth0(0,L9,Q1,_), F>=Q1, nth0(2,L9,Q2,_), F<=Q2,check_lists([P2,P3,P4,P5,P6,P7,P8],[L2,L3,L4,L5,L6,L7,L8]),test(Z,I).
 
 
 

@@ -1,5 +1,5 @@
 reject("1",
-	adapter(["A,B,C"]),
+	adapter("A,B,C"),
 	ether(vid(["1","2"]),
 	proto([X])),
 	ip(src_addr(["192.168.1.1"]),
@@ -9,7 +9,7 @@ reject("1",
 	icmp_code([P]))).
 
  accept("2",
-	adapter(["A","B","C"]),
+	adapter("A-C"),
 	ether(vid(["1","2"]),
 	proto([X])),
 	ip(src_addr(["192.168.1.1"]),
