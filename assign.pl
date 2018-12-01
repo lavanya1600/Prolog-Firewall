@@ -90,7 +90,7 @@ test(Z,I):- Z=accept,string_concat("Packet accepted by rule : ",I,S),write(S).
 test(Z,I):- Z=drop.
 
 
-validate(P1,L1):- 	split_string(L1,",","",L), len(L,X), X>1,contains(P1,L);
+validate(P1,L1):- 	var(L1);split_string(L1,",","",L), len(L,X), X>1,contains(P1,L);
 					split_string(L1,"-","",L), len(L,X), X=2,nth0(0,L,X1,_), nth0(1,L,X2,_),string_code(_,X1,Y1),string_code(_,X2,Y2),string_code(_,P1,Y3),(Y3>Y1;Y3=Y1),(Y3<Y2;Y3=Y2);
 					P1=L1.
 
