@@ -1,36 +1,55 @@
-
-reject("1",
-	adapter("A,B,C"),
-	ether(vid(["1","2"]),
-	proto([X])),
+	
+	accept("1",
+	adapter("D-H"),
+	ether(vid("1,2"),
+	proto("12")),
 	ip(src_addr(["192.168.1.1"]),
 	dst_addr([Y]),
-	tcp_udp_src_port(["80"]),
-	tcp_udp_dest_port([Z]),
-	icmp_code([P]))).
+	tcp_udp_src_port("80"),
+	tcp_udp_dest_port("25"),
+	icmp_code("1-3"))).
 
- accept("2",
+ 	accept("2",
 	adapter("A,B,C"),
-	ether(vid(["1","2"]),
-	proto([X])),
+	ether(vid("1,2"),
+	proto("12")),
 	ip(src_addr(["192.168.1.1"]),
 	dst_addr([Y]),
-	tcp_udp_src_port(["80"]),
-	tcp_udp_dest_port([Z]),
-	icmp_code([P]))). 
+	tcp_udp_src_port("80"),
+	tcp_udp_dest_port("25"),
+	icmp_code("1-3"))).
+
+
+ 	drop("3",
+	adapter("A-C"),
+	ether(vid("1,2"),
+	proto("12")),
+	ip(src_addr(["192.168.1.3"]),
+	dst_addr([Y]),
+	tcp_udp_src_port("80"),
+	tcp_udp_dest_port("25"),
+	icmp_code("1-3"))).
+
+
+
+ 	reject("4",
+	adapter("G"),
+	ether(vid("1,2"),
+	proto("12")),
+	ip(src_addr(["192.168.1.3"]),
+	dst_addr([Y]),
+	tcp_udp_src_port("80"),
+	tcp_udp_dest_port("25"),
+	icmp_code("1-3"))).
+
+
+
+	
 
 
 /* Rejects unmatched packets by default */
 
-reject("default",
-	adapter(A),
-	ether(vid(B),
-	proto(C)),
-	ip(src_addr(D),
-	dst_addr(E),
-	tcp_udp_src_port(F),
-	tcp_udp_dest_port(G),
-	icmp_code(H))).
+	
 
 
 

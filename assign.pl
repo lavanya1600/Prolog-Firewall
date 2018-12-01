@@ -20,6 +20,35 @@ len([H|T],L):- len(T,M), L is M+1.
 
 /* nth0() selects an element from the list (LIBRARY FUNCTION) */
 
+rule(P1,P2,P3,P4,P5,P6,P7,P8):- accept(I,adapter(L1),
+								ether(vid(L2),proto(L3)),
+								ip(src_addr(L4),
+								dst_addr(L5),
+								tcp_udp_src_port(L6),
+								tcp_udp_dest_port(L7),
+								icmp_code(L8))),validate(P1,L1),validate(P2,L2),validate(P3,L3),validate(P6,L6),validate(P7,L7),validate(P8,L8),check_lists([P4,P5],[L4,L5]),Z=accept,test(Z,I);
+
+								
+								reject(I,adapter(L1),
+								ether(vid(L2),proto(L3)),
+								ip(src_addr(L4),
+								dst_addr(L5),
+								tcp_udp_src_port(L6),
+								tcp_udp_dest_port(L7),
+								icmp_code(L8))),validate(P1,L1),Z=reject,validate(P2,L2),validate(P3,L3),validate(P6,L6),validate(P7,L7),validate(P8,L8),check_lists([P4,P5],[L4,L5]),test(Z,I);
+								
+								
+								drop(I,adapter(L1),
+								ether(vid(L2),proto(L3)),
+								ip(src_addr(L4),
+								dst_addr(L5),
+								tcp_udp_src_port(L6),
+								tcp_udp_dest_port(L7),
+								icmp_code(L8))),validate(P1,L1),Z=drop,validate(P2,L2),validate(P3,L3),validate(P6,L6),validate(P7,L7),validate(P8,L8),check_lists([P4,P5],[L4,L5]),test(Z,I).
+								
+
+
+
 
 packet(X):- split_string(X," ,"," ",L),  /* Splits the input string and stores the values in list L */
 			nth0(1,L,P1,_),
@@ -35,21 +64,13 @@ packet(X):- split_string(X," ,"," ",L),  /* Splits the input string and stores t
 
 
 
-/* rule function is defined that takes the values of the firewall parametres and matches them from accept,8*/
+/* rule function is defined that takes the values of the firewall parametres and matches them from accept,*/
 	/*reject or drop rules from our firewall database */
 
 
-rule(P1,P2,P3,P4,P5,P6,P7,P8):- accept(I,adapter(L1),
-								ether(vid(L2),proto(L3)),
-								ip(src_addr(L4),
-								dst_addr(L5),
-								tcp_udp_src_port(L6),
-								tcp_udp_dest_port(L7),
-								icmp_code(L8))),split_string(L1,",",",",L), len(L,X), X>1,Z=accept,check_lists([P1,P2,P3,P4,P5,P6,P7,P8],[L,L2,L3,L4,L5,L6,L7,L8]),test(Z,I).		
+
+
 								
-
-
-
 
 /* check_lists Function checks whether a member of List1 is member of an element in List2 */
 
@@ -66,6 +87,11 @@ test(Z,I):- Z=reject,string_concat("Packet rejected by rule : ",I,S),write(S).
 
 test(Z,I):- Z=accept,string_concat("Packet accepted by rule : ",I,S),write(S).
 
+test(Z,I):- Z=drop.
 
+
+validate(P1,L1):- 	split_string(L1,",","",L), len(L,X), X>1,contains(P1,L);
+					split_string(L1,"-","",L), len(L,X), X=2,nth0(0,L,X1,_), nth0(1,L,X2,_),string_code(_,X1,Y1),string_code(_,X2,Y2),string_code(_,P1,Y3),(Y3>Y1;Y3=Y1),(Y3<Y2;Y3=Y2);
+					P1=L1.
 
 
