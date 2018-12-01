@@ -26,7 +26,16 @@ rule(P1,P2,P3,P4,P5,P6,P7,P8):- accept(I,adapter(L1),
 								dst_addr(L5),
 								tcp_udp_src_port(L6),
 								tcp_udp_dest_port(L7),
-								icmp_code(L8))),validate(P1,L1),validate(P2,L2),validate(P3,L3),validate(P6,L6),validate(P7,L7),validate(P8,L8),check_lists([P4,P5],[L4,L5]),Z=accept,test(Z,I);
+								icmp_code(L8))),
+								validate_adapter(P1,L1),
+								validate(P2,L2),
+								validate(P3,L3),
+								validate_ip(P4,L4),
+								validate_ip(P5,L5),
+								validate(P6,L6),
+								validate(P7,L7),
+								validate(P8,L8),
+								Z=accept,test(Z,I);
 
 								
 								reject(I,adapter(L1),
@@ -35,7 +44,17 @@ rule(P1,P2,P3,P4,P5,P6,P7,P8):- accept(I,adapter(L1),
 								dst_addr(L5),
 								tcp_udp_src_port(L6),
 								tcp_udp_dest_port(L7),
-								icmp_code(L8))),validate(P1,L1),Z=reject,validate(P2,L2),validate(P3,L3),validate(P6,L6),validate(P7,L7),validate(P8,L8),check_lists([P4,P5],[L4,L5]),test(Z,I);
+								icmp_code(L8))),
+								validate_adapter(P1,L1),
+								validate(P2,L2),
+								validate(P3,L3),
+								validate_ip(P4,L4),
+								validate_ip(P5,L5),
+								validate(P6,L6),
+								validate(P7,L7),
+								validate(P8,L8),
+								Z=reject,
+								test(Z,I);
 								
 								
 								drop(I,adapter(L1),
@@ -44,7 +63,17 @@ rule(P1,P2,P3,P4,P5,P6,P7,P8):- accept(I,adapter(L1),
 								dst_addr(L5),
 								tcp_udp_src_port(L6),
 								tcp_udp_dest_port(L7),
-								icmp_code(L8))),validate(P1,L1),Z=drop,validate(P2,L2),validate(P3,L3),validate(P6,L6),validate(P7,L7),validate(P8,L8),check_lists([P4,P5],[L4,L5]),test(Z,I).
+								icmp_code(L8))),
+								validate_adapter(P1,L1),
+								validate(P2,L2),
+								validate(P3,L3),
+								validate_ip(P4,L4),
+								validate_ip(P5,L5),
+								validate(P6,L6),
+								validate(P7,L7),
+								validate(P8,L8),
+								Z=drop,
+								test(Z,I).
 								
 
 
@@ -90,8 +119,54 @@ test(Z,I):- Z=accept,string_concat("Packet accepted by rule : ",I,S),write(S).
 test(Z,I):- Z=drop.
 
 
-validate(P1,L1):- 	var(L1);split_string(L1,",","",L), len(L,X), X>1,contains(P1,L);
-					split_string(L1,"-","",L), len(L,X), X=2,nth0(0,L,X1,_), nth0(1,L,X2,_),string_code(_,X1,Y1),string_code(_,X2,Y2),string_code(_,P1,Y3),(Y3>Y1;Y3=Y1),(Y3<Y2;Y3=Y2);
+validate_adapter(P1,L1):- 	L1="any";
+							split_string(L1,",","",L), 
+							len(L,X), X>1,contains(P1,L);
+							split_string(L1,"-","",L), 
+							len(L,X), X=2,
+							nth0(0,L,X1,_), 
+							nth0(1,L,X2,_),
+							string_code(_,X1,Y1),
+							string_code(_,X2,Y2),
+							string_code(_,P1,Y3),
+							(Y3>Y1;Y3=Y1),
+							(Y3<Y2;Y3=Y2);
+							P1=L1.
+
+validate(P1,L1):- 	L1="any";
+					split_string(L1,",","",L), 
+					len(L,X), X>1,contains(P1,L);
+					split_string(L1,"-","",L), 
+					len(L,X), X=2,
+					nth0(0,L,X1,_), 
+					nth0(1,L,X2,_),
+					number_codes(Y1,X1),
+					number_codes(Y2,X2),
+					number_codes(Y3,P1),
+					(Y3>Y1;Y3=Y1),
+					(Y3<Y2;Y3=Y2);
 					P1=L1.
+
+
+validate_ip(P,L):- L="any";
+				   split_string(L,",","",X),
+				   len(X,Y), Y>1,contains(P,X);
+				   split_string(L,"-","",X),
+				   nth0(0,X,V1,_),
+				   nth0(1,X,V2,_),
+				   split_string(V1,".","",L1),
+				   split_string(V2,".","",L2),
+				   nth0(3,L1,C1,_),
+				   nth0(3,L2,C2,_), 
+				   split_string(P,".","",L3),
+				   nth0(3,L3,C3,_),
+				   number_codes(Y1,C1),
+				   number_codes(Y2,C2),
+				   number_codes(Y3,C3),
+				   (Y3>Y1;Y3=Y1),
+				   (Y3<Y2;Y3=Y2);
+				   P=L.
+
+
 
 
